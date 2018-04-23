@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TreasureHunt</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/4.10.1/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/4.10.1/firebase-auth.js"></script>
+    <script defer src="/__/firebase/4.10.1/firebase-database.js"></script>
+    <script defer src="/__/firebase/4.10.1/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/4.10.1/firebase-storage.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script defer src="/__/firebase/init.js"></script>
+    <script src="script.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="style.css"></link>
+  </head>
+  <body>
+     <canvas id="projector">Your browser does not support the Canvas element.</canvas>
+    <center>
+<img src="images/Treasure-Hunt-Logo.png"></img><br>
+<a style="margin-left:40px" href="welcome.html" class="btn btn-5">Enter</a>
+
+</center>
+    <script>
+        try {
+          let app = firebase.app();
+          console.log(app);
+          let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
+          document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
+        } catch (e) {
+          console.error(e);
+          document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
+        }
+      });
+    </script>
+  </body>
+</html>

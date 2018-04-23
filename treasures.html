@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Treasure Hunt</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="assets/css/main.css" />
+<!-- Scripts -->
+<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+<script src="assets/js/angular.min.js"></script>
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/jquery.scrolly.min.js"></script>
+<script src="assets/js/skel.min.js"></script>
+<script src="assets/js/util.js"></script>
+<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+<script src="assets/js/main.js"></script>
+<script>
+	var config = {
+		apiKey : "AIzaSyA-676h2Pri_7zW5hVRHfqN6TGn22dtMAM",
+		authDomain : "treasurehunt-3540e.firebaseapp.com",
+		databaseURL : "https://treasurehunt-3540e.firebaseio.com/",
+		storageBucket : "bucket.appspot.com"
+	};
+	firebase.initializeApp(config);
+
+	// Get a reference to the database service
+	var database = firebase.database();
+	console.log(database);
+	var treasuresRef = database.ref('treasures');
+	var count=0;
+	treasuresRef.on('value', function(snapshot) {
+		snapshot.forEach(function(childSnapshot) {
+			var childData = childSnapshot.val();
+			console.log(childData);
+			console.log(count);
+			if(count%2==0)
+				{
+				$("#treasurescontainer").append("<div style='padding:15px; background-color:#f9f9f9'><img style='margin-right:10px; margin-bottom:10px; width:200px; height:200px' align='left' src='"+childData.imageUrl+"'><h3 style='color:#252ea3'>"+childData.name+"</h3><br><b>Category: </b>" + childData.category+"<br><b>Information:</b>" + childData.info+"</div><hr>");
+				}else{
+				$("#treasurescontainer").append("<div style='padding:15px; background-color:#fff'><img style='margin-right:10px; margin-bottom:10px; width:200px; height:200px' align='left' src='"+childData.imageUrl+"'><h3 style='color:#252ea3'>"+childData.name+"</h3><br><b>Category: </b>" + childData.category+"<br><b>Information:</b>" + childData.info+"</div><hr>");
+				}
+		count=count+1;
+});
+	});
+</script>
+</head>
+<body>
+
+	<!-- Header -->
+	<section id="header">
+		<div class="inner">
+			<img src="images/Treasure-Hunt-Logo-small.png"></img>
+			<h1>Treasures</h1>
+			<p>The list of treasures available in the application...</p>
+			<ul class="actions">
+				<li><a href="welcome.html" class="button scrolly">BACK</a></li>
+
+			</ul>
+		</div>
+	</section>
+
+	<section id="two" class="main style1">
+		<div class="container">
+			<div class="row 150%">
+				<div class="12u$ 12u$(medium)">
+					<header class="major">
+						<h2>Treasures</h2>
+					</header>
+					<div id="treasurescontainer"></div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="footer">
+		<center>TreasureHunt</center>
+
+		<ul class="icons">
+			<li><a href="#" class="icon alt fa-twitter"><span
+					class="label">Twitter</span></a></li>
+			<li><a href="#" class="icon alt fa-facebook"><span
+					class="label">Facebook</span></a></li>
+			<li><a href="#" class="icon alt fa-instagram"><span
+					class="label">Instagram</span></a></li>
+			<li><a href="#" class="icon alt fa-github"><span
+					class="label">GitHub</span></a></li>
+			<li><a href="#" class="icon alt fa-envelope"><span
+					class="label">Email</span></a></li>
+		</ul>
+
+	</section>
+
+
+
+</body>
+</html>

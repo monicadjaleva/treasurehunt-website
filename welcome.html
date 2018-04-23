@@ -1,0 +1,288 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Treasure Hunt</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<!-- Scripts -->
+	<script src="assets/js/angular.min.js"></script>
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.cookie.js"></script>
+	<script src="assets/js/jquery.scrolly.min.js"></script>
+	<script src="assets/js/skel.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+	<script src="assets/js/main.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+	<script>
+	var config = {
+		apiKey : "AIzaSyA-676h2Pri_7zW5hVRHfqN6TGn22dtMAM",
+		authDomain : "treasurehunt-3540e.firebaseapp.com",
+		databaseURL : "https://treasurehunt-3540e.firebaseio.com/",
+		storageBucket : "bucket.appspot.com"
+	};
+	firebase.initializeApp(config);
+	// Get a reference to the database service
+	var database = firebase.database();
+
+	// Angular code
+	var app = angular.module('treasureHunt', []);
+	app.controller('myCtrl', function($scope, $window) {
+		console.log($.cookie("user"));
+		if($.cookie("user")!=null)
+		{
+			var user = JSON.parse($.cookie("user"));
+			if(user!=null)
+			{
+			console.log(user);
+			$scope.activeUserUsername=user.username;
+			$scope.activeUserName=user.firstName;
+			$scope.activeUserLastName=user.lastName;
+			$scope.activeUserLevel=user.level;
+			$scope.activeUserExperience=user.experience;
+			$scope.activeUserAvatar=user.avatar;
+			$scope.loggedin=true;
+		}
+		}else{
+			$scope.loggedin=false;
+		}
+
+
+		// Log out function
+		$scope.logOut=function(){
+			console.log("Logging out...");
+			$scope.loggedin=false;
+			$.cookie("user", null, { path: '/' });
+			$window.location.reload();
+		}
+
+		// Log in function
+		$scope.logIn=function(){
+			var username=$("#username").val();
+			var password=$("#password").val();
+			if(password==""&&username=="")
+			{
+				alert("Missing fields!");
+			}
+			else if(password=="")
+			{
+				alert("Password field is required!");
+			}
+			else if(username=="")
+			{
+				alert("Username field is required!");
+			}else{
+				// Connect to firebase user instance/ref
+				var userRef = database.ref().child("users").child(username);
+				userRef.on('value', function(snapshot) {
+					var user=snapshot.val();
+					if(user==null)
+					{
+						alert("A user with the specified username does not exist");
+
+					}
+					else if(user.password==password)
+					{
+						console.log("Logged in successfully");
+						$window.location.reload();
+						$.cookie("user", JSON.stringify(user));
+					}else{
+						alert("Incorrect password");
+					}
+				});
+			}
+		}
+
+
+	});
+
+
+</script>
+</head>
+<body ng-app="treasureHunt" ng-controller="myCtrl">
+	<!-- Header -->
+	<section id="header">
+		<div class="inner">
+			<img src="images/Treasure-Hunt-Logo-small.png"></img>
+			<h1>Treasure Hunt</h1>
+			<p>Explore the treasures of London, and dive into its culture
+				while playing in this adventure... {{treasure}}
+			</p>
+			<ul class="actions">
+				<li ng-show="!loggedin"><a href="#one" class="button scrolly">LOG IN/REGISTER</a></li>
+				<li ng-show="loggedin"><a href="#one" class="button special scrolly">USER	PROFILE</a></li>
+				<li><a href="#two" class="button scrolly">ABOUT</a></li>
+				<li><a href="#three" class="button scrolly">WHY
+					TREASUREHUNT?</a></li>
+					<li><a href="treasures.html" class="button">TREASURES</a></li>
+
+
+
+				</ul>
+			</div>
+		</section>
+
+		<!-- One -->
+		<section id="one" class="main style1">
+			<div class="container">
+				<div ng-show="!loggedin" class="row 150%">
+					<div class="6u 12u$(medium)">
+						<header class="major">
+							<h2>Log in</h2>
+						</header>
+						<p>Already registered? Log in and see your current statistics.<br> Note: You need <u>internet connection</u> to log in.</p>
+						<br>
+						<form>
+							<input id="username" type="text" placeholder="Username"></input> <br>
+							<input id="password" type="password" placeholder="Password"></input>
+							<button style="margin-top:30px" ng-click="logIn()" class="button special">Log in</button>
+
+						</form>
+						<header class="major">
+							<h2>Register</h2>
+						</header>
+						<p>New member? Nothing to worry about. Download our application
+							by clicking the link below and register directly on the
+							application or using our online registration form.</p>
+							<button style="background-color:#54f962" class="button special">Download</button>
+							<button>Register</button>
+						</div>
+
+
+						<div class="6u$ 12u$(medium) important(medium)">
+							<span class="image fit"><img src="images/pic01.png" alt="" /></span>
+						</div>
+					</li>
+				</div>
+				<div ng-show="loggedin" class="row 150%">
+					<div class="12u 12u$(medium)">
+						<img align="left" style="width:220px;height:220px" ng-src="images/{{activeUserAvatar}}.png" class="img-responsive " />
+					<h2 style="margin-bottom:-5px">	Hello, {{activeUserUsername}}!</h2>
+						<i style="color:#252ea3">Current Stats</i>
+						<br><b>Username:</b> {{activeUserUsername}}<br>
+						<b>First name:</b> {{activeUserName}}<br>
+						<b>Last name:</b> {{activeUserLastName}}<br>
+						<b>Level:</b> {{activeUserLevel}}<br>
+						<b>Experience:</b> {{activeUserExperience}}<b><br>
+							<button style="margin-top:30px" class="button special" ng-click="logOut()">Log out</button>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Two -->
+			<section id="two" class="main style2">
+				<div class="container">
+					<div class="row 150%">
+						<div class="6u 12u$(medium)">
+							<ul class="major-icons">
+								<li><span class="icon style1 major fa-cutlery"></span></li>
+								<li><span class="icon style2 major fa-camera-retro"></span></li>
+								<li><span class="icon style3 major fa-institution"></span></li>
+								<li><span class="icon style4 major fa-users"></span></li>
+								<li><span class="icon style5 major fa-diamond"></span></li>
+								<li><span class="icon style6 major fa-calendar"></span></li>
+							</ul>
+						</div>
+						<div class="6u$ 12u$(medium)">
+							<header class="major">
+								<h2>About</h2>
+							</header>
+							<p>
+								Love travelling? Craving to visit a lot of locations? Why not make
+								it a competition! <b>TreasureHunt</b> allows you to "collect" the
+								hidden treasures of London by visiting locations and adding them
+								to your collections of treasures, connect with your friends and
+								experience the spirit of cultural museums and galleries, warm and
+								cosy pubs or ancient historical sights.
+							</p>
+							<p>Create your own profile and keep track of all the locations
+								you visit.</p>
+								<p>
+									The treasure in the application include <b>museums</b>, <b>galleries</b>,
+									<b>castles<b>, <b>theatres</b>, <b>food and drink</b>
+									places and many more!
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<!-- Three -->
+					<section id="three" class="main style1 special">
+						<div class="container">
+							<header class="major">
+								<h2>Why TreasureHunt?</h2>
+							</header>
+							<p>The application is your travel buddy, making your trip fun and
+								competitive and allowing you to meet new people.</p>
+								<div class="row 150%">
+									<div class="4u 12u$(medium)">
+										<span class="image fit"><img src="images/pic02.jpg" alt="" /></span>
+										<h3>Travel</h3>
+										<p>Visit all the locations you wanted to, learn about their
+											secrets and have fun playing TreasureHunt while doing so.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</div>
+										<div class="4u 12u$(medium)">
+											<span class="image fit"><img src="images/pic03.jpg" alt="" /></span>
+											<h3>Explore</h3>
+											<p>You no longer need a map, as TreasureHunt points you to the
+												right directions to all the hidden gems.</p>
+												<ul class="actions">
+													<li><a href="#" class="button">More</a></li>
+												</ul>
+											</div>
+											<div class="4u$ 12u$(medium)">
+												<span class="image fit"><img src="images/pic04.jpg" alt="" /></span>
+												<h3>Socialize</h3>
+												<p>Meet fellow travellers and explore and socialize together!
+													<p>
+														<ul class="actions">
+															<li><a href="#" class="button">More</a></li>
+														</ul>
+													</div>
+												</div>
+											</div>
+										</section>
+
+										<!--
+										<section id="four" class="main style2 special">
+										<div class="container">
+										<header class="major">
+										<h2>Ipsum feugiat consequat?</h2>
+									</header>
+									<p>Sed lacus nascetur ac ante amet sapien.</p>
+									<ul class="actions uniform">
+									<li><a href="#" class="button special">Sign Up</a></li>
+									<li><a href="#" class="button">Learn More</a></li>
+								</ul>
+							</div>
+						</section>
+					-->
+
+					<!-- Footer -->
+					<section id="footer">
+						<center>TreasureHunt</center>
+
+						<ul class="icons">
+							<li><a href="#" class="icon alt fa-twitter"><span
+								class="label">Twitter</span></a></li>
+								<li><a href="#" class="icon alt fa-facebook"><span
+									class="label">Facebook</span></a></li>
+									<li><a href="#" class="icon alt fa-instagram"><span
+										class="label">Instagram</span></a></li>
+										<li><a href="#" class="icon alt fa-github"><span
+											class="label">GitHub</span></a></li>
+											<li><a href="#" class="icon alt fa-envelope"><span
+												class="label">Email</span></a></li>
+											</ul>
+											<center><font style="font-size:10px"<i>Template: <a target="_blank" href="https://html5up.net/">HTML5 UP</a></i></font></center>
+										</section>
+
+
+
+									</body>
+									</html>
